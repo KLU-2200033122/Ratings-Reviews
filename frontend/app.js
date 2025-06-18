@@ -38,7 +38,7 @@ async function submitReview(event, productId) {
   const rating = form.rating.value;
   const review = form.review.value;
 
-  const response = await fetch(`http://localhost:3000/api/products/${productId}/review`, {
+  const response = await fetch(`https://ratings-reviews-g0hm.onrender.com`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
