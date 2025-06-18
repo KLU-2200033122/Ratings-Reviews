@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ReviewZone - Home</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Navbar -->
+    <header>
+      <nav class="navbar" data-aos="fade-down">
+        <div class="logo">🌟 ReviewZone</div>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li id="login-link"><a href="login.html">Login</a></li>
+          <li id="signup-link"><a href="signup.html">Sign Up</a></li>
+        </ul>
+        <div class="user-actions" id="userActions"></div>
+      </nav>
+
+      <script>
+        const userName = localStorage.getItem("user_name");
+
+        if (userName) {
+          document.getElementById("login-link").style.display = "none";
+          document.getElementById("signup-link").style.display = "none";
+
+          const actionsDiv = document.getElementById("userActions");
+          actionsDiv.innerHTML = `
+            <span class="user-info">👤 ${userName}</span>
+            <button onclick="logout()" class="logout-btn">Logout</button>
+          `;
+        }
+
+        function logout() {
+          localStorage.clear();
+          alert("Logged out successfully!");
+          window.location.href = "index.html";
+        }
+      </script>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-content" data-aos="fade-up">
+      <h1>Welcome to ReviewZone</h1>
+      <p>Your one-stop platform to explore and share genuine product experiences.</p>
+      <a href="products.html"><button style="padding: 10px 20px; font-size: 16px;">Explore Products</button></a>
+    </main>
+
+    <footer class="footer">
+      <p>&copy; 2025 ReviewZone. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>AOS.init();</script>
+</body>
+</html>

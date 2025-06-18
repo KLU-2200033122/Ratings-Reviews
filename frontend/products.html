@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products - ReviewZone</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <style>
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .product {
+      background-color: #f5fff0;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .product:hover {
+      transform: translateY(-4px);
+    }
+
+    .product img {
+      width: 100%;
+      max-height: 180px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .review-box {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <nav class="navbar" data-aos="fade-down">
+        <div class="logo">🌟 ReviewZone</div>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li id="login-link"><a href="login.html">Login</a></li>
+          <li id="signup-link"><a href="signup.html">Sign Up</a></li>
+        </ul>
+        <div class="user-actions" id="userActions"></div>
+      </nav>
+      <script>
+        const userName = localStorage.getItem("user_name");
+        if (userName) {
+          document.getElementById("login-link").style.display = "none";
+          document.getElementById("signup-link").style.display = "none";
+          document.getElementById("userActions").innerHTML = `
+            <span class="user-info">👤 ${userName}</span>
+            <button onclick="logout()" class="logout-btn">Logout</button>
+          `;
+        }
+        function logout() {
+          localStorage.clear();
+          alert("Logged out successfully!");
+          window.location.href = "index.html";
+        }
+      </script>
+    </header>
+
+    <!-- ✅ MAIN CONTENT MODIFIED -->
+    <main class="page-content">
+      <h1>All Products & Reviews</h1>
+      <div id="products" class="product-grid"></div>
+    </main>
+
+    <footer class="footer">
+      <p>&copy; 2025 ReviewZone. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- AOS Animation -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>AOS.init();</script>
+
+  <!-- Product & Review Logic -->
+  <script>
+    const USER_ID = localStorage.getItem("user_id");
+
+    async function loadProducts() {
+      const res = await fetch("http://localhost:3000/api/products");
+      const products = await res.json();
+      const container = document.getElementById("products");
+      container.innerHTML = "";
+
+      products.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "product";
+        const imageName = p.image || p.name.toLowerCase().replace(/\s/g, '-') + '.jpg';
+
+        div.innerHTML = `
+          <img src="images/${imageName}" alt="${p.name}" />
+          <h3>${p.name}</h3>
+          <p>${p.description}</p>
+          ${USER_ID ? `
+            <form onsubmit="submitReview(event, '${p._id}')">
+              <input type="number" name="rating" min="1" max="5" placeholder="Rating" required />
+              <input type="text" name="review" placeholder="Write a review" required />
+              <button type="submit">Submit</button>
+            </form>
+          ` : `<p style="color:#888;font-style:italic;">Please login to submit a review.</p>`}
+          <div id="reviews-${p._id}" class="review-box"></div>
+        `;
+
+        container.appendChild(div);
+        loadReviews(p._id);
+      });
+    }
+
+    async function submitReview(event, productId) {
+      event.preventDefault();
+      const form = event.target;
+      const rating = form.rating.value;
+      const review = form.review.value;
+
+      const res = await fetch(`http://localhost:3000/api/products/${productId}/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: USER_ID, rating, review })
+      });
+
+      if (res.ok) {
+        alert("Review submitted!");
+        form.reset();
+        loadReviews(productId);
+      } else {
+        const err = await res.text();
+        alert("Error: " + err);
+      }
+    }
+
+    async function loadReviews(productId) {
+      const res = await fetch(`http://localhost:3000/api/products/${productId}/reviews`);
+      const reviews = await res.json();
+      const container = document.getElementById(`reviews-${productId}`);
+      container.innerHTML = reviews.map(r =>
+        `<p><strong>${r.user?.name || 'Anonymous'}:</strong> ${r.review} (${r.rating}/5)</p>`
+      ).join('');
+    }
+
+    loadProducts();
+  </script>
+</body>
+</html>

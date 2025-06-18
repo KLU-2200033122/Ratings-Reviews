@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - ReviewZone</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<!-- ✅ Navbar -->
+<header>
+  <nav class="navbar" data-aos="fade-down">
+    <div class="logo">🌟 ReviewZone</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li id="login-link"><a href="login.html">Login</a></li>
+      <li id="signup-link"><a href="signup.html">Sign Up</a></li>
+    </ul>
+    <div class="user-actions" id="userActions"></div>
+  </nav>
+
+  <!-- ✅ Show user name and logout if logged in -->
+  <script>
+    const userName = localStorage.getItem("user_name");
+
+    if (userName) {
+      document.getElementById("login-link").style.display = "none";
+      document.getElementById("signup-link").style.display = "none";
+
+      const actionsDiv = document.getElementById("userActions");
+      actionsDiv.innerHTML = `
+        <span class="user-info">👤 ${userName}</span>
+        <button onclick="logout()" class="logout-btn">Logout</button>
+      `;
+    }
+
+    function logout() {
+      localStorage.clear();
+      alert("Logged out successfully!");
+      window.location.href = "index.html";
+    }
+  </script>
+</header>
+
+<!-- ✅ Login Form -->
+<main class="page-content" data-aos="fade-up">
+  <h1>Login</h1>
+  <form id="loginForm">
+    <input type="email" name="email" placeholder="Email" required /><br />
+    <input type="password" name="password" placeholder="Password" required /><br />
+    <button type="submit">Login</button>
+    <!-- ✅ Forgot Password Link -->
+    <p style="margin-top: 12px;">
+      <a href="forgot-password.html" style="color: #1e90ff; text-decoration: underline;">Forgot Password?</a>
+    </p>
+  </form>
+</main>
+
+<!-- ✅ AOS Animation -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init();</script>
+
+<!-- ✅ Login Script -->
+<script>
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    const res = await fetch("http://localhost:3000/api/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (res.ok) {
+      const user = await res.json();
+      localStorage.setItem("user_id", user._id);
+      localStorage.setItem("user_name", user.name);
+      alert("Login successful!");
+      window.location.href = "products.html";
+    } else {
+      alert("Login failed! Invalid credentials.");
+    }
+  });
+</script>
+
+<!-- ✅ Footer -->
+<footer class="footer">
+  <p>&copy; 2025 ReviewZone. All rights reserved.</p>
+</footer>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init();</script>
+
+</body>
+</html>
