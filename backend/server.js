@@ -1,24 +1,34 @@
+// server.js
+require('dotenv').config(); // ✅ Load variables from .env
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 
-const app = express(); // ✅ app initialized before use
+const app = express(); // ✅ Initialize app
 
+// ✅ Middleware
 app.use(cors());
 app.use(express.json());
 
-// ✅ Serve frontend (e.g., index.html) statically
+// ✅ Serve static frontend files
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// ✅ Mount routes
+// ✅ Routes
 const reviewRoutes = require('./routes/reviewRoutes');
 app.use('/api', reviewRoutes);
 
 // ✅ MongoDB Connection
-mongoose.connect("mongodb+srv://charitha:yourpassword123@cluster0.phyadiz.mongodb.net/ratingsDB?retryWrites=true&w=majority&appName=Cluster0")
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// ✅ Start Server
-app.listen(3000, () => console.log('Server running at http://localhost:3000'));
+// ✅ Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
