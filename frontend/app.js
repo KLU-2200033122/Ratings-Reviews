@@ -1,7 +1,7 @@
 const USER_ID = localStorage.getItem("user_id");
 
 async function loadProducts() {
-  const res = await fetch('http://localhost:3000/api/products');
+  const res = await fetch('https://ratings-reviews-g0hm.onrender.com');
   const products = await res.json();
   const container = document.getElementById('products');
 
